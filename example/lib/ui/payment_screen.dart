@@ -52,7 +52,7 @@ class PaymentScreen extends StatelessWidget {
     final networkService = locator.get<NetworkService>();
     final response = await networkService.createAutomaticPaymentIntent();
     if (response.status == 'succeeded') {
-      // TODO: success
+      // success
       debugPrint('Success before authentication.');
       return;
     }
@@ -62,7 +62,7 @@ class PaymentScreen extends StatelessWidget {
       paymentMethodId: 'pm_card_threeDSecure2Required',
     );
     if (result['status'] == 'succeeded') {
-      // TODO: success
+      // success
       debugPrint('Success after authentication.');
       return;
     } else {
@@ -78,13 +78,14 @@ class PaymentScreen extends StatelessWidget {
       Stripe.instance.getReturnUrlForSca(webReturnUrl: '/'),
     ) as FutureOr<Map<dynamic, dynamic>>);
     if (response['status'] == 'succeeded') {
-      // TODO: success
+      // success
       debugPrint('Success before authentication.');
       return;
     }
-    final result = await Stripe.instance.authenticatePayment(response['clientSecret'], context);
+    final result = await Stripe.instance
+        .authenticatePayment(response['clientSecret'], context);
     if (result['status'] == 'requires_confirmation') {
-      // TODO: make call to server to confirm
+      // make call to server to confirm
       debugPrint('Success after authentication.');
       return;
     } else {

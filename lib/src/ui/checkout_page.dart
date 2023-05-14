@@ -12,15 +12,20 @@ import 'widgets/payment_method_selector.dart';
 
 class CheckoutPage extends StatefulWidget {
   final Future<IntentClientSecret> Function() createPaymentIntent;
-  final void Function(BuildContext context, Map<String, dynamic> paymentIntent) onPaymentSuccess;
-  final void Function(BuildContext context, Map<String, dynamic> paymentIntent) onPaymentFailed;
-  final void Function(BuildContext context, StripeApiException e) onPaymentError;
+  final void Function(BuildContext context, Map<String, dynamic> paymentIntent)
+      onPaymentSuccess;
+  final void Function(BuildContext context, Map<String, dynamic> paymentIntent)
+      onPaymentFailed;
+  final void Function(BuildContext context, StripeApiException e)
+      onPaymentError;
 
   CheckoutPage({
     Key? key,
     required this.createPaymentIntent,
-    void Function(BuildContext context, Map<String, dynamic> paymentIntent)? onPaymentSuccess,
-    void Function(BuildContext context, Map<String, dynamic> paymentIntent)? onPaymentFailed,
+    void Function(BuildContext context, Map<String, dynamic> paymentIntent)?
+        onPaymentSuccess,
+    void Function(BuildContext context, Map<String, dynamic> paymentIntent)?
+        onPaymentFailed,
     void Function(BuildContext, StripeApiException)? onPaymentError,
   })  : onPaymentSuccess = onPaymentSuccess ?? StripeUiOptions.onPaymentSuccess,
         onPaymentFailed = onPaymentFailed ?? StripeUiOptions.onPaymentFailed,
@@ -42,8 +47,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   void initState() {
     _clientSecretFuture = widget.createPaymentIntent();
-    paymentIntentFuture =
-        _clientSecretFuture.then((value) => Stripe.instance.api.retrievePaymentIntent(value.clientSecret));
+    paymentIntentFuture = _clientSecretFuture.then((value) =>
+        Stripe.instance.api.retrievePaymentIntent(value.clientSecret));
     super.initState();
   }
 
@@ -76,7 +81,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                         snapshot.data!,
                         _selectedPaymentMethod == null
                             ? null
-                            : _createAttemptPaymentFunction(context, _clientSecretFuture)),
+                            : _createAttemptPaymentFunction(
+                                context, _clientSecretFuture)),
                   );
                 } else {
                   return _selectedPaymentMethod == null
@@ -91,15 +97,20 @@ class _CheckoutPageState extends State<CheckoutPage> {
     );
   }
 
-  void Function() _createAttemptPaymentFunction(BuildContext context, Future<IntentClientSecret> paymentIntentFuture) {
+  void Function() _createAttemptPaymentFunction(
+      BuildContext context, Future<IntentClientSecret> paymentIntentFuture) {
     return () async {
       showProgressDialog(context);
-      final initialPaymentIntent = await paymentIntentFuture.catchError((error){
+      final initialPaymentIntent =
+          await paymentIntentFuture.catchError((error) {
         hideProgressDialog(context);
+
+        return IntentClientSecret('', '');
       });
       try {
-        final confirmedPaymentIntent = await Stripe.instance
-            .confirmPayment(initialPaymentIntent.clientSecret, context, paymentMethodId: _selectedPaymentMethod);
+        final confirmedPaymentIntent = await Stripe.instance.confirmPayment(
+            initialPaymentIntent.clientSecret, context,
+            paymentMethodId: _selectedPaymentMethod);
         if (confirmedPaymentIntent['status'] == 'succeeded') {
           widget.onPaymentSuccess(context, confirmedPaymentIntent);
           hideProgressDialog(context);

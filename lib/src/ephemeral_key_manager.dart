@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 import 'dart:convert' show json;
 import 'dart:developer';
@@ -36,7 +34,7 @@ class EphemeralKey {
   late DateTime _expiresAt;
 
   EphemeralKey.fromJson(Map<String, dynamic> json) {
-    // TODO might throw an error if ephemeralKey doesn't provide all fields.
+    // might throw an error if ephemeralKey doesn't provide all fields.
     _id = optString(json, fieldId)!;
     _created = optInteger(json, fieldCreated)!;
     _expires = optInteger(json, fieldExpires)!;
